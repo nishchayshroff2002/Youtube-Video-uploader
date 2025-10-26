@@ -65,11 +65,16 @@ def start():
     return render_template("start.html")
 
 
-@app.route("/owner/register", methods = ['GET'])
+@app.route("/owner/signin", methods = ['GET'])
 def register_as_owner():
-    return render_template("register_owner.html")
+    return render_template("signin_owner.html")
 
-@app.route("/owner/register", methods=['POST'])
+@app.route("/user/signin", methods = ['GET'])
+def register_as_user():
+    return render_template("signin_user.html")
+
+
+@app.route("/owner/signin", methods=['POST'])
 def get_consent_screen():
     auth_url, state = flow.authorization_url(
     access_type="offline",           # request refresh token
@@ -78,7 +83,12 @@ def get_consent_screen():
     )
     return redirect(auth_url)
 
-
+@app.route("/user/signin", methods = ['POST'])
+def user_signin():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    return f"Received username: {username}, password: {password}"
+    
 @app.route("/oauth",methods = ['GET'])
 def get_refresh_token():
     flow.fetch_token(authorization_response=request.url)
