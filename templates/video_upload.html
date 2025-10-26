@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Video Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, textarea { width: 300px; padding: 5px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+        h2 { margin-bottom: 20px; color: #333; }
+    </style>
+</head>
+<body>
+
+<h1>YouTube Video Upload</h1>
+
+<!-- Show the channel name passed from backend -->
+<h2>Channel: {{ channel_name }}</h2>
+
+<form id="uploadForm" method="POST" action="/upload" enctype="multipart/form-data">
+    
+    <!-- Hidden channel_id field -->
+    <!-- <input type="hidden" name="channel_id" value="{{ channel_id }}"> -->
+
+    <!-- Video metadata -->
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" rows="4"></textarea>
+
+    <label for="tags">Tags (comma-separated):</label>
+    <input type="text" id="tags" name="tags">
+
+    <label for="category">Category ID:</label>
+    <input type="number" id="category" name="categoryId" value="22">
+
+    <label for="privacy">Privacy:</label>
+    <select name="privacyStatus" id="privacy">
+        <option value="private">Private</option>
+        <option value="unlisted">Unlisted</option>
+        <option value="public">Public</option>
+    </select>
+
+    <!-- File uploads -->
+    <label for="video_file">Video File:</label>
+    <input type="file" id="video_file" name="video_file" accept="video/*" required>
+
+    <label for="thumbnail_file">Thumbnail (optional):</label>
+    <input type="file" id="thumbnail_file" name="thumbnail_file" accept="image/*">
+
+    <button type="submit">Upload Video</button>
+</form>
+
+</body>
+</html>
