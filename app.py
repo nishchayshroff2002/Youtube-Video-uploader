@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for,flash,send_from_directory
+from flask import Flask, render_template, request, redirect, url_for,flash,send_from_directory,session
 import os
+import db 
+import sendotp
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 app = Flask(__name__)
-
+app.secret_key = "super_secret_key"
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:5000/oauth"
@@ -85,10 +87,19 @@ def get_consent_screen():
 
 @app.route("/user/signin", methods = ['POST'])
 def user_signin():
-    username = request.form.get('username')
+    email = request.form.get('email')
     password = request.form.get('password')
-    return f"Received username: {username}, password: {password}"
-    
+    if db.check_user(email,password) == False:
+        session["otp"]  = sendotp.send_otp(email)
+        return redirect("/user/otp")
+    return f"Received  email: {email}, password: {password}"
+
+@app.route("/user/otp", methods = 'GET')
+def send_otp():
+    return render_template("otp.html")
+
+
+
 @app.route("/oauth",methods = ['GET'])
 def get_refresh_token():
     flow.fetch_token(authorization_response=request.url)
