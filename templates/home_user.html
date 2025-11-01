@@ -2,10 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Available Channels</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            background-color: white;
+            width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .channel-section {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .channel-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .channel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .channel-name {
+            flex: 1;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .owner-email {
+            flex: 1.2;
+            font-size: 15px;
+            color: #555;
+            word-break: break-all;
+        }
+
+        .upload-btn {
+            flex: 0.4;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="main-container">
+        <h2>Welcome to Your Dashboard</h2>
+
+        <div class="channel-section">
+            <h3>Your Channels</h3>
+            <ul class="channel-list">
+                {% for entry in channel_info %}
+                <li>
+                    <div class="channel-item">
+                        <span class="channel-name">{{ entry['channel_name'] }}</span>
+                        <span class="owner-email">{{ entry['owner_email'] }}</span>
+                        <form action="/upload" method="GET">
+                            <input type="hidden" name="channel_name" value="{{ entry['channel_name'] | urlencode }}">
+                            <input type="hidden" name="owner_email" value="{{ entry['owner_email'] | urlencode }}">
+                            <button type="submit" class="upload-btn">Upload</button>
+                        </form>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>No channels found.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

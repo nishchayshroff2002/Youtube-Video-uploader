@@ -2,100 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Available Channels</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .main-container {
-            background-color: white;
-            width: 400px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        h2 {
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        /* Section for channels */
-        .channel-section {
-            border-top: 1px solid #ddd;
-            padding-top: 15px;
-        }
-
-        .channel-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .channel-list form {
-            margin: 0;
-        }
-
-        .channel-list button {
-            width: 100%;
-            padding: 10px;
-            margin: 6px 0;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            text-align: left;
-            transition: background-color 0.2s;
-        }
-
-        .channel-list button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Placeholder for other content */
-        .other-section {
-            text-align: center;
-            padding: 10px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
-    <div class="main-container">
-        <h2>Welcome to Your Dashboard</h2>
-
-        <!-- Other content (e.g., stats, user info) -->
-        <!-- <div class="other-section">
-            <p>Select the channels.</p>
-        </div> -->
-
-        <!-- Channel list section -->
-        <div class="channel-section">
-            <h3>Your Channels</h3>
-            <ul class="channel-list">
-                {% for name in channel_names %}
-                <li>
-                    <form action="/upload/{{ name }}" method="GET">
-                        <button type="submit">{{ name }}</button>
-                    </form>
-                </li>
-                {% else %}
-                <li><p>No channels found.</p></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+    
 </body>
 </html>
