@@ -2,21 +2,25 @@ import smtplib
 import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-sender_email = "shroffnishchay@gmail.com"
-sender_password = "S1Q3T3#PE"
-msg = MIMEMultipart()
-msg["From"] = sender_email
+import os
+
 def send_otp(receiver_email):
+    sender_email = os.getenv("SENDER_EMAIL")
+    sender_password = os.getenv("SENDER_PASSWORD")
+
+    # Create a fresh message object each time
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
     msg["To"] = receiver_email
-    
+    msg["Subject"] = "Your OTP Code"
+
     # Generate OTP
-    otp = str(random.randint(10000000,99999999 ))
-    # Email content
-    subject = "Your OTP Code"
+    otp = str(random.randint(10000000, 99999999))
+
+    # Email body
     body = f"Your one-time password (OTP) is: {otp}"
-    msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
-    # Send the email
+
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
@@ -25,4 +29,5 @@ def send_otp(receiver_email):
             print("OTP sent successfully!")
     except Exception as e:
         print("Error:", e)
+
     return otp
