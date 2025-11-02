@@ -94,7 +94,7 @@
                     <div class="channel-item">
                         <span class="channel-name">{{ entry['channel_name'] }}</span>
                         <span class="owner-email">{{ entry['owner_email'] }}</span>
-                        <form action="/upload" method="GET">
+                        <form action="/upload-request" method="GET">
                             <input type="hidden" name="channel_name" value="{{ entry['channel_name'] | urlencode }}">
                             <input type="hidden" name="owner_email" value="{{ entry['owner_email'] | urlencode }}">
                             <button type="submit" class="upload-btn">Upload</button>

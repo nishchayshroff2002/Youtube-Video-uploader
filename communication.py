@@ -2,6 +2,7 @@ import smtplib
 import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask import url_for
 import os
 
 def send_otp(receiver_email):
@@ -31,6 +32,7 @@ def send_otp(receiver_email):
         print("Error:", e)
 
     return otp
+
 def send_approval_message(receiver_email,channel_name):
     sender_email = os.getenv("SENDER_EMAIL")
     sender_password = os.getenv("SENDER_PASSWORD")
@@ -40,7 +42,7 @@ def send_approval_message(receiver_email,channel_name):
     msg["From"] = sender_email
     msg["To"] = receiver_email
     msg["Subject"] = "Request for uploading video to youtube channel: "+ channel_name
-    verification_link = ""
+    verification_link = url_for('/pending-approvals', _external=True)
     # Email body
     body = body = f"""
     <html>
@@ -58,8 +60,6 @@ def send_approval_message(receiver_email,channel_name):
             server.starttls()
             server.login(sender_email, sender_password)
             server.send_message(msg)
-            print("OTP sent successfully!")
+            print("Approval mail sent successfully!")
     except Exception as e:
         print("Error:", e)
-
-    return otp

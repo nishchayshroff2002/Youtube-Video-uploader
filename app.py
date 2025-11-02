@@ -86,6 +86,8 @@ def register_as_owner():
 
 @app.route("/owner/signin", methods=['POST'])
 def get_consent_screen():
+    if session["owner_email"]:
+        return redirect("/owner/home")
     flow =get_flow()
     auth_url, state = flow.authorization_url(
     access_type="offline",           # request refresh token
@@ -104,6 +106,7 @@ def get_refresh_token():
     refresh_token= credentials.refresh_token
     youtube =get_youtube_service(refresh_token)
     channel,owner_email = get_channel_info(youtube)
+    session["owner_email"]=owner_email
     if db.check_channel(refresh_token,channel) ==False:
         db.insert_channel(refresh_token,channel,owner_email)
     return redirect("/owner/home")
@@ -152,13 +155,13 @@ def get_video(filename):
 def get_thumbnail(filename):
     return send_from_directory(THUMBNAIL_FOLDER, filename)
 
-@app.route("/upload",methods = ['GET'])
+@app.route("/upload-request",methods = ['GET'])
 def video_upload():
     channel_name = request.args.get('channel_name')
     owner_email = request.args.get('owner_email')
     return render_template("video_upload.html",channel_name=channel_name,owner_email=owner_email)
 
-@app.route("/upload",methods = ['POST'])
+@app.route("/upload-request",methods = ['POST'])
 def upload_video():
     title = request.form.get("title")
     description = request.form.get("description")
@@ -176,10 +179,16 @@ def upload_video():
     if thumb_file and allowed_file(thumb_file.filename, IMAGE_EXTENSIONS):
         thumb_path = os.path.join(THUMBNAIL_FOLDER, get_new_name(video_id,thumb_file.filename))
         thumb_file.save(thumb_path)
+    communication.send_approval_message(owner_email,channel_name)
+    flash(f"upload request sent successfully!", "success")
+    return redirect("/user/home")
 
-    flash(f"File '{video.filename}' upload request sent successfully!", "success")
-    return redirect()
-
+@app.route("/pending-approvals",methods=['GET'])
+def check_approvals():
+    if session["owner_email"]:
+        return redirect("/owner/home")
+    else :
+        return redirect("/owner/signin")
 
 if __name__ == "__main__":
     app.run(debug=True)
