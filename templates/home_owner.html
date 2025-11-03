@@ -2,10 +2,213 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Owner Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            background-color: white;
+            width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .channel-info {
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .video-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .video-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .video-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+        }
+
+        .video-details span {
+            font-size: 15px;
+            color: #333;
+        }
+
+        .video-details strong {
+            color: #000;
+        }
+
+        .thumbnail {
+            width: 120px;
+            height: 70px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .video-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .approve-btn, .disapprove-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.2s;
+        }
+
+        .approve-btn {
+            background-color: #28a745;
+        }
+
+        .approve-btn:hover {
+            background-color: #218838;
+        }
+
+        .disapprove-btn {
+            background-color: #dc3545;
+        }
+
+        .disapprove-btn:hover {
+            background-color: #c82333;
+        }
+
+        a.video-link {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        a.video-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="main-container">
+        <h2>Owner Dashboard</h2>
+        <div class="channel-info">
+            <p><strong>Channel Name:</strong> {{ channel_name }}</p>
+            <p><strong>Owner Email:</strong> {{ owner_email }}</p>
+        </div>
+
+        <!-- Pending Approvals Section -->
+        <div class="section">
+            <h3>Pending Approvals</h3>
+            <ul class="video-list">
+                {% for video in pending_videos %}
+                <li>
+                    <div class="video-item">
+                        <div class="video-details">
+                            <span><strong>Title:</strong> {{ video['title'] }}</span>
+                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+                            <span><strong>Description:</strong> {{ video['description'] }}</span>
+                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+                            <span><strong>Video Preview:</strong> 
+                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
+                            </span>
+                            <span><strong>Thumbnail:</strong> 
+                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
+                            </span>
+                        </div>
+                        <div class="video-actions">
+                            <!-- Approve form -->
+                            <form action="/approve" method="POST" style="display:inline;">
+                                <input type="hidden" name="video_id" value="{{ video['_id'] }}">
+                                <input type="hidden" name="channel_name" value="{{ channel_name }}">
+                                <input type="hidden" name="owner_email" value="{{ owner_email }}">
+                                <button type="submit" class="approve-btn">Approve</button>
+                            </form>
+
+                            <!-- Disapprove form -->
+                            <form action="/disapprove" method="POST" style="display:inline;">
+                                <input type="hidden" name="video_id" value="{{ video['_id'] }}">
+                                <input type="hidden" name="channel_name" value="{{ channel_name }}">
+                                <input type="hidden" name="owner_email" value="{{ owner_email }}">
+                                <button type="submit" class="disapprove-btn">Disapprove</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>No pending approvals.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Complete Approvals Section -->
+        <div class="section">
+            <h3>Complete Approvals</h3>
+            <ul class="video-list">
+                {% for video in approved_videos %}
+                <li>
+                    <div class="video-item">
+                        <div class="video-details">
+                            <span><strong>Title:</strong> {{ video['title'] }}</span>
+                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+                            <span><strong>Description:</strong> {{ video['description'] }}</span>
+                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+                            <span><strong>Video Link:</strong> 
+                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            </span>
+                            <span><strong>Thumbnail:</strong> 
+                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>No approved videos yet.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

@@ -7,6 +7,7 @@ from google.oauth2.credentials import Credentials
 from google.oauth2 import id_token
 import google.auth.transport.requests
 from googleapiclient.discovery import build
+from urllib.parse import urlencode
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -55,7 +56,7 @@ def get_youtube_service(refresh_token):
     # Refresh automatically if expired
     service = build("youtube", "v3", credentials=creds)
     return service
-def get_channel_info(youtube): #channel_name+owner_email
+def get_channel_info(youtube,credentials): #channel_name+owner_email
     request = youtube.channels().list(
         part="snippet",
         mine=True,
@@ -72,9 +73,10 @@ def get_channel_info(youtube): #channel_name+owner_email
     return channel_name,owner_email
 def allowed_file(filename, allowed_set):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_set
-def get_new_name(new_name,orignal_name):
+def get_extension(orignal_name):
     name,ext=orignal_name.rsplit(".",1)
-    return new_name+"."+ext
+    return ext
+
 @app.route("/")
 def start():
     return render_template("start.html")
@@ -86,8 +88,9 @@ def register_as_owner():
 
 @app.route("/owner/signin", methods=['POST'])
 def get_consent_screen():
-    if session["owner_email"]:
-        return redirect("/owner/home")
+    if session.get("owner_email") and session.get("channel_name"):
+        params={"owner_email": session["owner_email"], "channel_name":session['channel_name']}
+        return redirect(f"/owner/home?{urlencode(params)}")
     flow =get_flow()
     auth_url, state = flow.authorization_url(
     access_type="offline",           # request refresh token
@@ -105,15 +108,24 @@ def get_refresh_token():
     credentials = flow.credentials
     refresh_token= credentials.refresh_token
     youtube =get_youtube_service(refresh_token)
-    channel,owner_email = get_channel_info(youtube)
+    channel,owner_email = get_channel_info(youtube,credentials)
     session["owner_email"]=owner_email
+    session["channel_name"]=channel
     if db.check_channel(refresh_token,channel) ==False:
         db.insert_channel(refresh_token,channel,owner_email)
-    return redirect("/owner/home")
+    params={"owner_email": owner_email, "channel_name":channel}
+    return redirect(f"/owner/home?{urlencode(params)}")
+    
 
 @app.route("/owner/home", methods =['GET'])
 def home_owner():
-    return render_template("home_user.html")
+    owner_email = request.args.get("owner_email")
+    channel_name=request.args.get("channel_name")
+    pending_video_list=db.get_pending_video_list_channel(owner_email,channel_name)
+    pending_video_info=db.get_video_info(pending_video_list)
+    approved_video_list=db.get_approved_video_list_channel(owner_email,channel_name)
+    approved_video_info=db.get_video_info(approved_video_list)
+    return render_template("home_owner.html",pending_video_info=pending_video_info,approved_video_info=approved_video_info)
 
 @app.route("/user/signin", methods = ['GET'])
 def register_as_user():
@@ -170,14 +182,16 @@ def upload_video():
     privacy_status = request.form.get("privacyStatus")
     channel_name = request.args.get('channel_name')
     owner_email = request.args.get('owner_email')
-    video_id=db.insert_video(title,description,tags,category_id,privacy_status,owner_email,session["email"],session["password"],channel_name)
     video_file = request.files.get("video_file")
     thumb_file = request.files.get("thumbnail_file")
+    video_extension = get_extension(video_file.filename)
+    thumbnail_extension = get_extension(thumb_file.filename)
+    video_id=db.insert_video(title,description,tags,category_id,privacy_status,owner_email,session["email"],session["password"],channel_name,video_extension,thumbnail_extension)
     if video_file and allowed_file(video_file.filename, VIDEO_EXTENSIONS):
-        video_path = os.path.join(VIDEO_FOLDER, get_new_name(video_id,video_file.filename))
+        video_path = os.path.join(VIDEO_FOLDER, video_id+"."+video_extension)
         video_file.save(video_path)
     if thumb_file and allowed_file(thumb_file.filename, IMAGE_EXTENSIONS):
-        thumb_path = os.path.join(THUMBNAIL_FOLDER, get_new_name(video_id,thumb_file.filename))
+        thumb_path = os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension)
         thumb_file.save(thumb_path)
     communication.send_approval_message(owner_email,channel_name)
     flash(f"upload request sent successfully!", "success")
@@ -185,11 +199,18 @@ def upload_video():
 
 @app.route("/pending-approvals",methods=['GET'])
 def check_approvals():
-    if session["owner_email"]:
+    if session.get("owner_email") and session.get("channel_name"):
         return redirect("/owner/home")
     else :
         return redirect("/owner/signin")
-
+@app.route("/disapprove",methods=['POST'])
+def disapprove():
+    video_id=request.args.get('video_id')
+    owner_email = request.args.get('owner_email')
+    channel_name=request.args.get('channel_name')
+    db.delete_pending_video(owner_email,channel_name,video_id)
+    params={"owner_email": owner_email, "channel_name":channel_name}
+    return redirect(f"/owner/home?{urlencode(params)}")
 if __name__ == "__main__":
     app.run(debug=True)
     # 

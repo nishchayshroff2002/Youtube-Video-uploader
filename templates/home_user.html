@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Available Channels</title>
+    <title>User Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,68 +17,77 @@
 
         .main-container {
             background-color: white;
-            width: 700px;
+            width: 900px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 30px;
         }
 
         h2 {
-            margin-bottom: 10px;
             text-align: center;
+            margin-bottom: 20px;
         }
 
-        .channel-section {
+        .section {
             border-top: 1px solid #ddd;
             padding-top: 15px;
         }
 
-        .channel-list {
+        .section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .video-list {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
 
-        .channel-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .video-item {
             background-color: #f8f9fa;
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .channel-name {
-            flex: 1;
-            font-weight: bold;
+        .video-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+        }
+
+        .video-details span {
+            font-size: 15px;
             color: #333;
         }
 
-        .owner-email {
-            flex: 1.2;
-            font-size: 15px;
-            color: #555;
+        .video-details strong {
+            color: #000;
+        }
+
+        .thumbnail {
+            width: 120px;
+            height: 70px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        a.video-link {
+            color: #007bff;
+            text-decoration: none;
             word-break: break-all;
         }
 
-        .upload-btn {
-            flex: 0.4;
-            padding: 8px 14px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .upload-btn:hover {
-            background-color: #0056b3;
+        a.video-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -86,7 +95,8 @@
     <div class="main-container">
         <h2>Welcome to Your Dashboard</h2>
 
-        <div class="channel-section">
+        <!-- Your Channels Section -->
+        <div class="section">
             <h3>Your Channels</h3>
             <ul class="channel-list">
                 {% for entry in channel_info %}
@@ -94,15 +104,66 @@
                     <div class="channel-item">
                         <span class="channel-name">{{ entry['channel_name'] }}</span>
                         <span class="owner-email">{{ entry['owner_email'] }}</span>
-                        <form action="/upload-request" method="GET">
-                            <input type="hidden" name="channel_name" value="{{ entry['channel_name'] | urlencode }}">
-                            <input type="hidden" name="owner_email" value="{{ entry['owner_email'] | urlencode }}">
-                            <button type="submit" class="upload-btn">Upload</button>
-                        </form>
                     </div>
                 </li>
                 {% else %}
                 <li><p>No channels found.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Pending Approvals Section -->
+        <div class="section">
+            <h3>Pending Approvals</h3>
+            <ul class="video-list">
+                {% for video in pending_videos %}
+                <li>
+                    <div class="video-item">
+                        <div class="video-details">
+                            <span><strong>Title:</strong> {{ video['title'] }}</span>
+                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+                            <span><strong>Description:</strong> {{ video['description'] }}</span>
+                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+                            <span><strong>Video Link:</strong>
+                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            </span>
+                            <span><strong>Thumbnail:</strong>
+                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>No pending approvals.</p></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Complete Approvals Section -->
+        <div class="section">
+            <h3>Complete Approvals</h3>
+            <ul class="video-list">
+                {% for video in approved_videos %}
+                <li>
+                    <div class="video-item">
+                        <div class="video-details">
+                            <span><strong>Title:</strong> {{ video['title'] }}</span>
+                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+                            <span><strong>Description:</strong> {{ video['description'] }}</span>
+                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+                            <span><strong>Video Link:</strong>
+                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            </span>
+                            <span><strong>Thumbnail:</strong>
+                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>No approved or disapproved videos yet.</p></li>
                 {% endfor %}
             </ul>
         </div>
