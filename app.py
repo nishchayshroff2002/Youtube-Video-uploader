@@ -121,11 +121,12 @@ def get_refresh_token():
 def home_owner():
     owner_email = request.args.get("owner_email")
     channel_name=request.args.get("channel_name")
-    pending_video_list=db.get_pending_video_list_channel(owner_email,channel_name)
-    pending_video_info=db.get_video_info(pending_video_list)
-    approved_video_list=db.get_approved_video_list_channel(owner_email,channel_name)
-    approved_video_info=db.get_video_info(approved_video_list)
-    return render_template("home_owner.html",pending_video_info=pending_video_info,approved_video_info=approved_video_info)
+    owner_id=db.get_owner_id(owner_email,channel_name)
+    pending_video_info=db.get_pending_video_info_owner(owner_id)
+    pending_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in pending_video_info ]
+    approved_video_info=db.get_approved_video_info_owner(owner_id)
+    approved_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in approved_video_info ]
+    return render_template("home_owner.html",pending_video_info=pending_video_info,approved_video_info=approved_video_info,pending_video_user_emails = pending_video_user_emails,approved_video_user_emails = approved_video_user_emails)
 
 @app.route("/user/signin", methods = ['GET'])
 def register_as_user():
@@ -186,7 +187,9 @@ def upload_video():
     thumb_file = request.files.get("thumbnail_file")
     video_extension = get_extension(video_file.filename)
     thumbnail_extension = get_extension(thumb_file.filename)
-    video_id=db.insert_video(title,description,tags,category_id,privacy_status,owner_email,session["email"],session["password"],channel_name,video_extension,thumbnail_extension)
+    user_id=db.get_user_id(session["email"],session["password"])
+    owner_id=db.get_owner_id(owner_email,channel_name)
+    video_id=db.insert_video(title,description,tags,category_id,privacy_status,video_extension,thumbnail_extension,user_id,owner_id)
     if video_file and allowed_file(video_file.filename, VIDEO_EXTENSIONS):
         video_path = os.path.join(VIDEO_FOLDER, video_id+"."+video_extension)
         video_file.save(video_path)
@@ -208,7 +211,8 @@ def disapprove():
     video_id=request.args.get('video_id')
     owner_email = request.args.get('owner_email')
     channel_name=request.args.get('channel_name')
-    db.delete_pending_video(owner_email,channel_name,video_id)
+    owner_id=db.get_owner_id(owner_email,channel_name)
+    db.delete_pending_video(owner_id,video_id)
     params={"owner_email": owner_email, "channel_name":channel_name}
     return redirect(f"/owner/home?{urlencode(params)}")
 if __name__ == "__main__":
