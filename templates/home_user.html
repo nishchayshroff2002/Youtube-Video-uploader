@@ -41,13 +41,13 @@
             color: #333;
         }
 
-        .video-list {
+        .video-list, .channel-list {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
 
-        .video-item {
+        .video-item, .channel-item {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
@@ -89,6 +89,15 @@
         a.video-link:hover {
             text-decoration: underline;
         }
+
+        .owner-info {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .owner-info strong {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -99,11 +108,11 @@
         <div class="section">
             <h3>Your Channels</h3>
             <ul class="channel-list">
-                {% for entry in channel_info %}
+                {% for entry in channels_info %}
                 <li>
                     <div class="channel-item">
-                        <span class="channel-name">{{ entry['channel_name'] }}</span>
-                        <span class="owner-email">{{ entry['owner_email'] }}</span>
+                        <span><strong>Channel Name:</strong> {{ entry['channel_name'] }}</span><br>
+                        <span><strong>Owner Email:</strong> {{ entry['owner_email'] }}</span>
                     </div>
                 </li>
                 {% else %}
@@ -117,9 +126,12 @@
             <h3>Pending Approvals</h3>
             <ul class="video-list">
                 {% for video in pending_videos %}
+                {% set owner_info = pending_video_owner_info[loop.index0] %}
                 <li>
                     <div class="video-item">
                         <div class="video-details">
+                            <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
+                            <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
                             <span><strong>Title:</strong> {{ video['title'] }}</span>
                             <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
                             <span><strong>Description:</strong> {{ video['description'] }}</span>
@@ -145,9 +157,12 @@
             <h3>Complete Approvals</h3>
             <ul class="video-list">
                 {% for video in approved_videos %}
+                {% set owner_info = approved_video_owner_info[loop.index0] %}
                 <li>
                     <div class="video-item">
                         <div class="video-details">
+                            <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
+                            <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
                             <span><strong>Title:</strong> {{ video['title'] }}</span>
                             <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
                             <span><strong>Description:</strong> {{ video['description'] }}</span>

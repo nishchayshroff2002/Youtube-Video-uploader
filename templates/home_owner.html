@@ -158,18 +158,41 @@
                                 <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
                             </span>
                         </div>
+
                         <div class="video-actions">
+                            <!-- Approve Form -->
                             <form action="/approve" method="POST" style="display:inline;">
                                 <input type="hidden" name="video_id" value="{{ video['_id'] }}">
                                 <input type="hidden" name="channel_name" value="{{ channel_name }}">
                                 <input type="hidden" name="owner_email" value="{{ owner_email }}">
+                                <input type="hidden" name="title" value="{{ video['title'] }}">
+                                <input type="hidden" name="description" value="{{ video['description'] }}">
+                                <input type="hidden" name="tags" value="{{ video['tags'] | join(', ') }}">
+                                <input type="hidden" name="category_id" value="{{ video['category_id'] }}">
+                                <input type="hidden" name="privacy_status" value="{{ video['privacy_status'] }}">
+                                <input type="hidden" name="video_file_name" value="{{ video['video_file_name'] }}">
+                                <input type="hidden" name="video_extension" value="{{ video['video_extension'] }}">
+                                <input type="hidden" name="thumbnail_file_name" value="{{ video['thumbnail_file_name'] }}">
+                                <input type="hidden" name="thumbnail_extension" value="{{ video['thumbnail_extension'] }}">
+                                 <input type="hidden" name="user_email" value="{{ pending_video_user_emails[loop.index0] }}">
                                 <button type="submit" class="approve-btn">Approve</button>
                             </form>
 
+                            <!-- Disapprove Form -->
                             <form action="/disapprove" method="POST" style="display:inline;">
                                 <input type="hidden" name="video_id" value="{{ video['_id'] }}">
                                 <input type="hidden" name="channel_name" value="{{ channel_name }}">
                                 <input type="hidden" name="owner_email" value="{{ owner_email }}">
+                                <input type="hidden" name="title" value="{{ video['title'] }}">
+                                <input type="hidden" name="description" value="{{ video['description'] }}">
+                                <input type="hidden" name="tags" value="{{ video['tags'] | join(', ') }}">
+                                <input type="hidden" name="category_id" value="{{ video['category_id'] }}">
+                                <input type="hidden" name="privacy_status" value="{{ video['privacy_status'] }}">
+                                <input type="hidden" name="video_file_name" value="{{ video['video_file_name'] }}">
+                                <input type="hidden" name="video_extension" value="{{ video['video_extension'] }}">
+                                <input type="hidden" name="thumbnail_file_name" value="{{ video['thumbnail_file_name'] }}">
+                                <input type="hidden" name="thumbnail_extension" value="{{ video['thumbnail_extension'] }}">
+                                 <input type="hidden" name="user_email" value="{{ pending_video_user_emails[loop.index0] }}">
                                 <button type="submit" class="disapprove-btn">Disapprove</button>
                             </form>
                         </div>

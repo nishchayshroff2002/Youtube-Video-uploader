@@ -5,6 +5,7 @@ import communication
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from google.oauth2 import id_token
+from googleapiclient.http import MediaFileUpload
 import google.auth.transport.requests
 from googleapiclient.discovery import build
 from urllib.parse import urlencode
@@ -73,9 +74,9 @@ def get_channel_info(youtube,credentials): #channel_name+owner_email
     return channel_name,owner_email
 def allowed_file(filename, allowed_set):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_set
-def get_extension(orignal_name):
+def get_name_and_extension(orignal_name):
     name,ext=orignal_name.rsplit(".",1)
-    return ext
+    return name,ext
 
 @app.route("/")
 def start():
@@ -111,7 +112,7 @@ def get_refresh_token():
     channel,owner_email = get_channel_info(youtube,credentials)
     session["owner_email"]=owner_email
     session["channel_name"]=channel
-    if db.check_channel(refresh_token,channel) ==False:
+    if db.check_channel(refresh_token,channel,owner_email) ==False:
         db.insert_channel(refresh_token,channel,owner_email)
     params={"owner_email": owner_email, "channel_name":channel}
     return redirect(f"/owner/home?{urlencode(params)}")
@@ -126,7 +127,7 @@ def home_owner():
     pending_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in pending_video_info ]
     approved_video_info=db.get_approved_video_info_owner(owner_id)
     approved_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in approved_video_info ]
-    return render_template("home_owner.html",pending_video_info=pending_video_info,approved_video_info=approved_video_info,pending_video_user_emails = pending_video_user_emails,approved_video_user_emails = approved_video_user_emails)
+    return render_template("home_owner.html",pending_videos=pending_video_info,approved_videos=approved_video_info,pending_video_user_emails = pending_video_user_emails,approved_video_user_emails = approved_video_user_emails)
 
 @app.route("/user/signin", methods = ['GET'])
 def register_as_user():
@@ -157,7 +158,12 @@ def verify_otp():
 @app.route("/user/home", methods =['GET'])
 def home_user():
     channels_info = db.get_all_channel_names_and_owner_emails()
-    return render_template("home_user.html",channels_info=channels_info)
+    user_id=db.get_user_id(session["email"],session["password"])
+    pending_video_info=db.get_pending_video_info_user(user_id)
+    pending_video_owner_info=[db.get_owner_email_and_channel_name_from_id(vid["owner_id"]) for vid in pending_video_info] #has channel_name and owner_info
+    approved_video_info=db.get_approved_video_info_user(user_id)
+    approved_video_owner_info=[db.get_owner_email_and_channel_name_from_id(vid["owner_id"]) for vid in approved_video_info] #has channel_name and owner_info  
+    return render_template("home_user.html",channels_info=channels_info,pending_videos=pending_video_info,pending_video_owner_info=pending_video_owner_info,approved_videos=approved_video_info,approved_video_owner_info=approved_video_owner_info)
 
           
 @app.route("/videos/<filename>")
@@ -185,18 +191,18 @@ def upload_video():
     owner_email = request.args.get('owner_email')
     video_file = request.files.get("video_file")
     thumb_file = request.files.get("thumbnail_file")
-    video_extension = get_extension(video_file.filename)
-    thumbnail_extension = get_extension(thumb_file.filename)
+    video_name,video_extension = get_name_and_extension(video_file.filename)
+    thumbnail_name,thumbnail_extension = get_name_and_extension(thumb_file.filename)
     user_id=db.get_user_id(session["email"],session["password"])
     owner_id=db.get_owner_id(owner_email,channel_name)
-    video_id=db.insert_video(title,description,tags,category_id,privacy_status,video_extension,thumbnail_extension,user_id,owner_id)
+    video_id=db.insert_video(title,description,tags,category_id,privacy_status,video_name,video_extension,thumbnail_name,thumbnail_extension,user_id,owner_id)
     if video_file and allowed_file(video_file.filename, VIDEO_EXTENSIONS):
         video_path = os.path.join(VIDEO_FOLDER, video_id+"."+video_extension)
         video_file.save(video_path)
     if thumb_file and allowed_file(thumb_file.filename, IMAGE_EXTENSIONS):
         thumb_path = os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension)
         thumb_file.save(thumb_path)
-    communication.send_approval_message(owner_email,channel_name)
+    communication.send_approval_message(owner_email,channel_name,session["email"])
     flash(f"upload request sent successfully!", "success")
     return redirect("/user/home")
 
@@ -206,15 +212,95 @@ def check_approvals():
         return redirect("/owner/home")
     else :
         return redirect("/owner/signin")
+
 @app.route("/disapprove",methods=['POST'])
 def disapprove():
-    video_id=request.args.get('video_id')
-    owner_email = request.args.get('owner_email')
-    channel_name=request.args.get('channel_name')
-    owner_id=db.get_owner_id(owner_email,channel_name)
-    db.delete_pending_video(owner_id,video_id)
+    video_id = request.form.get("video_id")
+    channel_name = request.form.get("channel_name")
+    owner_email = request.form.get("owner_email")
+    title = request.form.get("title")
+    description = request.form.get("description")
+    category_id = request.form.get("category_id")
+    privacy_status = request.form.get("privacy_status")
+    tags = request.form.get("tags")  # comma-separated string if sent as hidden input
+    video_file_name = request.form.get("video_file_name")
+    video_extension = request.form.get("video_extension")
+    thumbnail_file_name = request.form.get("thumbnail_file_name")
+    thumbnail_extension = request.form.get("thumbnail_extension")
+    user_email = request.form.get("user_email")
+    # optional: convert tags string back to a list
+    if tags:
+        tags = [t.strip() for t in tags.split(",")]
+    communication.send_disapproved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension)
+    db.delete_pending_video(video_id)
     params={"owner_email": owner_email, "channel_name":channel_name}
+    flash("Video disapproved successfully")
     return redirect(f"/owner/home?{urlencode(params)}")
+
+@app.route("/approve",methods=['POST'])
+def approve():
+    video_id = request.form.get("video_id")
+    channel_name = request.form.get("channel_name")
+    owner_email = request.form.get("owner_email")
+    title = request.form.get("title")
+    description = request.form.get("description")
+    category_id = request.form.get("category_id")
+    privacy_status = request.form.get("privacy_status")
+    tags = request.form.get("tags")  # comma-separated string if sent as hidden input
+    video_file_name = request.form.get("video_file_name")
+    video_extension = request.form.get("video_extension")
+    thumbnail_file_name = request.form.get("thumbnail_file_name")
+    thumbnail_extension = request.form.get("thumbnail_extension")
+    user_email = request.form.get("user_email")
+    # optional: convert tags string back to a list
+    if tags:
+        tags = [t.strip() for t in tags.split(",")]
+    else:
+        tags=[]
+    refresh_token = db.get_refresh_token(owner_email,channel_name)
+    youtube = get_youtube_service(refresh_token)
+    request_body = {
+        "snippet": {
+            "title": title,
+            "description": description,
+            "tags": tags,
+            "categoryId": str(category_id),
+        },
+        "status": {
+            "privacyStatus": privacy_status,  # "public", "private", or "unlisted"
+        },
+    }
+    vid_file_name = f"{video_id}.{video_extension}"
+    video_file =os.path.join(VIDEO_FOLDER,vid_file_name)
+
+    if video_file and os.path.exists(video_file):
+        media = MediaFileUpload(video_file, chunksize=-1, resumable=True)
+        request = youtube.videos().insert(
+            part="snippet,status",
+            body=request_body,
+            media_body=media
+        )
+
+        response = None
+        while response is None:
+            status, response = request.next_chunk()
+            if status:
+                print(f"Uploading... {int(status.progress() * 100)}%")
+    
+    thumb_file_name = f"{video_id}.{thumbnail_extension}"
+    thumbnail_file = os.path.join(THUMBNAIL_FOLDER,thumb_file_name)
+    if thumbnail_file and os.path.exists(thumbnail_file):
+        youtube.thumbnails().set(
+            videoId=response["id"],
+            media_body=MediaFileUpload(thumbnail_file)
+        ).execute()
+        print("✅ Thumbnail uploaded successfully!")
+    communication.send_approved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension)
+    db.approve_video(video_id)
+    params={"owner_email": owner_email, "channel_name":channel_name}
+    flash("Video disapproved successfully")
+    return redirect(f"/owner/home?{urlencode(params)}")
+
 if __name__ == "__main__":
     app.run(debug=True)
     # 
