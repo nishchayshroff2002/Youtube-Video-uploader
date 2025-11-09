@@ -25,7 +25,10 @@ os.makedirs(THUMBNAIL_FOLDER, exist_ok=True)
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.readonly",
-    "https://www.googleapis.com/auth/youtube.upload"
+    "https://www.googleapis.com/auth/youtube.upload",
+    "openid",
+    "email",
+    "profile"
 ]
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -302,5 +305,5 @@ def approve():
     return redirect(f"/owner/home?{urlencode(params)}")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="localhost", port=5000, debug=True)
     # 
