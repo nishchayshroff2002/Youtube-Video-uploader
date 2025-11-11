@@ -14,9 +14,14 @@ app.secret_key = "super_secret_key"
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:5000/oauth"
-BASE_UPLOAD_PATH = "/data/uploads"
-VIDEO_FOLDER = os.path.join(BASE_UPLOAD_PATH, "videos") 
+
+BASE_UPLOAD_PATH = "data/uploads"
+VIDEO_FOLDER = os.path.join(BASE_UPLOAD_PATH, "videos")
 THUMBNAIL_FOLDER = os.path.join(BASE_UPLOAD_PATH, "thumbnails")
+
+for folder in [VIDEO_FOLDER, THUMBNAIL_FOLDER]:
+    os.makedirs(folder, exist_ok=True)
+
 VIDEO_EXTENSIONS = {"mp4", "webm", "ogg","ogv"}
 IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
 
@@ -26,9 +31,10 @@ os.makedirs(THUMBNAIL_FOLDER, exist_ok=True)
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.readonly",
     "https://www.googleapis.com/auth/youtube.upload",
-    "openid",
-    "email",
-    "profile"
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "openid"
 ]
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -55,7 +61,7 @@ def get_youtube_service(refresh_token):
         token_uri="https://oauth2.googleapis.com/token",
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
-        scopes=["https://www.googleapis.com/auth/youtube.readonly"]
+        scopes=SCOPES
     )
     # Refresh automatically if expired
     service = build("youtube", "v3", credentials=creds)
@@ -115,7 +121,7 @@ def get_refresh_token():
     channel,owner_email = get_channel_info(youtube,credentials)
     session["owner_email"]=owner_email
     session["channel_name"]=channel
-    if db.check_channel(refresh_token,channel,owner_email) ==False:
+    if db.check_channel(channel,owner_email) ==False:
         db.insert_channel(refresh_token,channel,owner_email)
     params={"owner_email": owner_email, "channel_name":channel}
     return redirect(f"/owner/home?{urlencode(params)}")
@@ -130,7 +136,7 @@ def home_owner():
     pending_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in pending_video_info ]
     approved_video_info=db.get_approved_video_info_owner(owner_id)
     approved_video_user_emails=[db.get_user_email_from_id(vid["user_id"]) for vid in approved_video_info ]
-    return render_template("home_owner.html",pending_videos=pending_video_info,approved_videos=approved_video_info,pending_video_user_emails = pending_video_user_emails,approved_video_user_emails = approved_video_user_emails)
+    return render_template("home_owner.html",pending_videos=pending_video_info,approved_videos=approved_video_info,pending_video_user_emails = pending_video_user_emails,approved_video_user_emails = approved_video_user_emails,channel_name=channel_name,owner_email=owner_email)
 
 @app.route("/user/signin", methods = ['GET'])
 def register_as_user():
@@ -140,7 +146,7 @@ def register_as_user():
 def user_signin():
     session["email"] = request.form.get('email')
     session["password"] = request.form.get('password')
-    if db.check_user(session["email"],session["password"]) == False:
+    if db.check_user(session["email"]) == False:
         session["otp"]  = communication.send_otp(session["email"])
         return redirect("/user/otp")
     return redirect("/user/home")
@@ -177,11 +183,11 @@ def get_video(filename):
 def get_thumbnail(filename):
     return send_from_directory(THUMBNAIL_FOLDER, filename)
 
-@app.route("/upload-request",methods = ['GET'])
+@app.route("/upload-request", methods=['GET'])
 def video_upload():
     channel_name = request.args.get('channel_name')
     owner_email = request.args.get('owner_email')
-    return render_template("video_upload.html",channel_name=channel_name,owner_email=owner_email)
+    return render_template("video_upload.html", channel_name=channel_name, owner_email=owner_email)
 
 @app.route("/upload-request",methods = ['POST'])
 def upload_video():
@@ -190,15 +196,15 @@ def upload_video():
     tags = request.form.get("tags")
     category_id = request.form.get("categoryId")
     privacy_status = request.form.get("privacyStatus")
-    channel_name = request.args.get('channel_name')
-    owner_email = request.args.get('owner_email')
+    channel_name = request.form.get('channel_name')
+    owner_email = request.form.get('owner_email')
     video_file = request.files.get("video_file")
     thumb_file = request.files.get("thumbnail_file")
     video_name,video_extension = get_name_and_extension(video_file.filename)
     thumbnail_name,thumbnail_extension = get_name_and_extension(thumb_file.filename)
     user_id=db.get_user_id(session["email"],session["password"])
     owner_id=db.get_owner_id(owner_email,channel_name)
-    video_id=db.insert_video(title,description,tags,category_id,privacy_status,video_name,video_extension,thumbnail_name,thumbnail_extension,user_id,owner_id)
+    video_id=str(db.insert_video(title,description,tags,category_id,privacy_status,video_name,video_extension,thumbnail_name,thumbnail_extension,user_id,owner_id))
     if video_file and allowed_file(video_file.filename, VIDEO_EXTENSIONS):
         video_path = os.path.join(VIDEO_FOLDER, video_id+"."+video_extension)
         video_file.save(video_path)
@@ -278,7 +284,7 @@ def approve():
 
     if video_file and os.path.exists(video_file):
         media = MediaFileUpload(video_file, chunksize=-1, resumable=True)
-        request = youtube.videos().insert(
+        vid_request = youtube.videos().insert(
             part="snippet,status",
             body=request_body,
             media_body=media
@@ -286,7 +292,7 @@ def approve():
 
         response = None
         while response is None:
-            status, response = request.next_chunk()
+            status, response = vid_request.next_chunk()
             if status:
                 print(f"Uploading... {int(status.progress() * 100)}%")
     

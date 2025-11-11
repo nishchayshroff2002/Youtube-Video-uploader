@@ -47,7 +47,49 @@
             margin: 0;
         }
 
-        .video-item, .channel-item {
+        /* Channel items on one line */
+        .channel-item {
+            background-color: #f8f9fa;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            font-size: 15px;
+        }
+
+        .channel-info span strong {
+            color: #000;
+        }
+
+        .upload-form {
+            margin: 0;
+        }
+
+        .upload-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .video-item {
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
@@ -90,14 +132,6 @@
             text-decoration: underline;
         }
 
-        .owner-info {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .owner-info strong {
-            color: #000;
-        }
     </style>
 </head>
 <body>
@@ -111,8 +145,16 @@
                 {% for entry in channels_info %}
                 <li>
                     <div class="channel-item">
-                        <span><strong>Channel Name:</strong> {{ entry['channel_name'] }}</span><br>
-                        <span><strong>Owner Email:</strong> {{ entry['owner_email'] }}</span>
+                        <div class="channel-info">
+                            <span><strong>Channel Name:</strong> {{ entry['channel_name'] }}</span>
+                            <span><strong>Owner Email:</strong> {{ entry['owner_email'] }}</span>
+                        </div>
+
+                        <form class="upload-form" action="/upload-request" method="get">
+                            <input type="hidden" name="channel_name" value="{{ entry['channel_name'] }}">
+                            <input type="hidden" name="owner_email" value="{{ entry['owner_email'] }}">
+                            <button type="submit" class="upload-btn">Upload Video</button>
+                        </form>
                     </div>
                 </li>
                 {% else %}
@@ -137,11 +179,11 @@
                             <span><strong>Description:</strong> {{ video['description'] }}</span>
                             <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
                             <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-                            <span><strong>Video Link:</strong>
-                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            <span><strong>Video Preview:</strong> 
+                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
                             </span>
-                            <span><strong>Thumbnail:</strong>
-                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                            <span><strong>Thumbnail:</strong> 
+                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
                             </span>
                         </div>
                     </div>
@@ -168,11 +210,11 @@
                             <span><strong>Description:</strong> {{ video['description'] }}</span>
                             <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
                             <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-                            <span><strong>Video Link:</strong>
-                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            <span><strong>Video Preview:</strong> 
+                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
                             </span>
-                            <span><strong>Thumbnail:</strong>
-                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                            <span><strong>Thumbnail:</strong> 
+                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
                             </span>
                         </div>
                     </div>

@@ -41,7 +41,7 @@ def send_approval_message(receiver_email,channel_name,user_email):
     msg["From"] = sender_email
     msg["To"] = receiver_email
     msg["Subject"] = "Request for uploading video to youtube channel: "+ channel_name
-    verification_link = url_for('/pending-approvals', _external=True)
+    verification_link = url_for('check_approvals', _external=True)
     # Email body
     body = f"""
     <html>

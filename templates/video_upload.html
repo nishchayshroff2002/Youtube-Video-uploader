@@ -18,9 +18,9 @@
 <!-- Show the channel name passed from backend -->
 <h2>Channel: {{ channel_name }}</h2>
 <h2>Owner email: {{owner_email}}</h2>
-<form id="uploadForm" method="POST" action="/upload-request/" enctype="multipart/form-data">
-    <input type="hidden" name="channel_name" value="{{ channel_name | urlencode }}">
-    <input type="hidden" name="owner_email" value="{{ owner_email | urlencode }}">
+<form id="uploadForm" method="POST" action="/upload-request" enctype="multipart/form-data">
+    <input type="hidden" name="channel_name" value="{{ channel_name }}">
+    <input type="hidden" name="owner_email" value="{{ owner_email }}">
     
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required>
