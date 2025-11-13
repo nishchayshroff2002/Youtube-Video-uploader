@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login Form</title>
+    <title>User registration</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,6 +18,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            width: 300px;
         }
         input {
             display: block;
@@ -38,6 +39,27 @@
         button:hover {
             background-color: #0056b3;
         }
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            width: 100%;
+            text-align: center;
+        }
+        .flashes li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +67,30 @@
         <h2>Signin as User</h2>
         <input type="email" name="email" placeholder="Enter email" required>
         <input type="password" name="password" placeholder="Enter password" required>
+
+        <!-- Flash message block (appears above Submit button) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
         <button type="submit">Submit</button>
     </form>
+    <script>
+  // Automatically hide flash messages after 3 seconds
+  setTimeout(() => {
+    const flashMessages = document.querySelector('.flashes');
+    if (flashMessages) {
+      flashMessages.style.transition = "opacity 0.5s ease";
+      flashMessages.style.opacity = "0";
+      setTimeout(() => flashMessages.remove(), 500);
+    }
+  }, 1000); // 3 seconds
+</script>
 </body>
 </html>

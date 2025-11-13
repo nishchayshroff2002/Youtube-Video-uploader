@@ -32,14 +32,21 @@ def get_user_email_from_id(user_id):
     if result is not None:
         return result["email"]
 
-def check_user(email):
-    query = {"email":email}
+def check_user(email,password):
+    query = {"email":email,"password":password}
     result = user_info.find_one(query,{"_id": 1})
     if result:
         return True
     else :
         return False
-    
+def get_password(email):
+     query = {"email":email}
+     result = user_info.find_one(query,{"password": 1})
+     if result :
+         return result["password"]
+     else:
+         return ""
+
 def get_owner_email_and_channel_name_from_id(owner_id):
     query = {"_id":owner_id}
     result = channel_info.find_one(query)

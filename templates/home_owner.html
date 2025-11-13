@@ -218,11 +218,11 @@
                             <span><strong>Description:</strong> {{ video['description'] }}</span>
                             <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
                             <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-                            <span><strong>Video Link:</strong> 
-                                <a href="{{ video['video_link'] }}" class="video-link" target="_blank">View Video</a>
+                            <span><strong>Video Preview:</strong> 
+                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
                             </span>
                             <span><strong>Thumbnail:</strong> 
-                                <img src="{{ video['thumbnail_link'] }}" class="thumbnail" alt="Thumbnail">
+                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
                             </span>
                         </div>
                     </div>

@@ -146,10 +146,17 @@ def register_as_user():
 def user_signin():
     session["email"] = request.form.get('email')
     session["password"] = request.form.get('password')
-    if db.check_user(session["email"]) == False:
+    password_from_db = db.get_password(session["email"])
+
+    if password_from_db == "":
         session["otp"]  = communication.send_otp(session["email"])
         return redirect("/user/otp")
-    return redirect("/user/home")
+    elif password_from_db == session["password"]:
+        return redirect("/user/home")
+    else:
+        flash("incorrect password")
+        return render_template("signin_user.html")
+
 
 @app.route("/user/otp", methods = ['GET'])
 def send_otp():
