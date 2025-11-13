@@ -4,52 +4,144 @@
     <meta charset="UTF-8">
     <title>YouTube Video Upload</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select, textarea { width: 300px; padding: 5px; margin-top: 5px; }
-        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
-        h2 { margin-bottom: 20px; color: #333; }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+        form {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .flashes li {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
+    <form id="uploadForm" method="POST" action="/upload-request" enctype="multipart/form-data">
+        <h1>YouTube Video Upload</h1>
+        <div class="info">
+            <p><strong>Channel:</strong> {{ channel_name }}</p>
+            <p><strong>Owner Email:</strong> {{ owner_email }}</p>
+        </div>
 
-<h1>YouTube Video Upload</h1>
+        <!-- Flash message block -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
 
-<!-- Show the channel name passed from backend -->
-<h2>Channel: {{ channel_name }}</h2>
-<h2>Owner email: {{owner_email}}</h2>
-<form id="uploadForm" method="POST" action="/upload-request" enctype="multipart/form-data">
-    <input type="hidden" name="channel_name" value="{{ channel_name }}">
-    <input type="hidden" name="owner_email" value="{{ owner_email }}">
-    
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required>
+        <input type="hidden" name="channel_name" value="{{ channel_name }}">
+        <input type="hidden" name="owner_email" value="{{ owner_email }}">
 
-    <label for="description">Description:</label>
-    <textarea id="description" name="description" rows="4"></textarea>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
 
-    <label for="tags">Tags (comma-separated):</label>
-    <input type="text" id="tags" name="tags">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4"></textarea>
 
-    <label for="category">Category ID:</label>
-    <input type="number" id="category" name="categoryId" value="22">
+        <label for="tags">Tags (comma-separated):</label>
+        <input type="text" id="tags" name="tags">
 
-    <label for="privacy">Privacy:</label>
-    <select name="privacyStatus" id="privacy">
-        <option value="private">Private</option>
-        <option value="unlisted">Unlisted</option>
-        <option value="public">Public</option>
-    </select>
+        <label for="category">Category ID:</label>
+        <input type="number" id="category" name="categoryId" value="22">
 
-    <!-- File uploads -->
-    <label for="video_file">Video File:</label>
-    <input type="file" id="video_file" name="video_file" accept="video/*" required>
+        <label for="privacy">Privacy:</label>
+        <select name="privacyStatus" id="privacy">
+            <option value="private">Private</option>
+            <option value="unlisted">Unlisted</option>
+            <option value="public">Public</option>
+        </select>
 
-    <label for="thumbnail_file">Thumbnail (optional):</label>
-    <input type="file" id="thumbnail_file" name="thumbnail_file" accept="image/*">
+        <label for="video_file">Video File:</label>
+        <input type="file" id="video_file" name="video_file" accept="video/*" required>
 
-    <button type="submit">Upload Video</button>
-</form>
+        <label for="thumbnail_file">Thumbnail (optional):</label>
+        <input type="file" id="thumbnail_file" name="thumbnail_file" accept="image/*">
 
+        <button type="submit">Upload Video</button>
+    </form>
+
+    <script>
+        // Hide flash messages after 3 seconds
+        setTimeout(() => {
+            const flashMessages = document.querySelector('.flashes');
+            if (flashMessages) {
+                flashMessages.style.transition = "opacity 0.5s ease";
+                flashMessages.style.opacity = "0";
+                setTimeout(() => flashMessages.remove(), 500);
+            }
+        }, 3000);
+    </script>
 </body>
 </html>

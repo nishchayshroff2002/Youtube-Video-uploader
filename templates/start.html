@@ -1,40 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Youtube Video uploader</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 100px;
-        }
-        button {
-            margin: 20px;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>YouTube Video Uploader</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      animation: fadeInDown 1s ease;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 250px;
+      animation: fadeInUp 1.2s ease;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      color: #5563DE;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      background: #f1f1f1;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome</h1>
+  <h1>Welcome to YouTube Uploader</h1>
 
+  <div class="button-container">
     <form action="/owner/signin" method="get">
-        <button type="submit">Signin as Owner</button>
+      <button type="submit">Sign in as Owner</button>
     </form>
 
     <form action="/user/signin" method="get">
-        <button type="submit">Signin as User</button>
+      <button type="submit">Sign in as User</button>
     </form>
+  </div>
 
+  <footer>© 2025 YouTube Uploader</footer>
 </body>
 </html>

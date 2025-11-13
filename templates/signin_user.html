@@ -1,96 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User registration</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            height: 100vh;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f2f5;
-        }
-        form {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 300px;
-        }
-        input {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .flashes {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-            width: 100%;
-            text-align: center;
-        }
-        .flashes li {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>User Sign In</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      text-align: center;
+      animation: fadeInUp 1s ease;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #5563DE;
+      font-size: 26px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #5563DE;
+      box-shadow: 0 0 6px rgba(85, 99, 222, 0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background-color: #5563DE;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      background-color: #3f4acb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    .flashes {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    .flashes li {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      animation: fadeInDown 0.5s ease;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <form action="/user/signin" method="POST">
-        <h2>Signin as User</h2>
-        <input type="email" name="email" placeholder="Enter email" required>
-        <input type="password" name="password" placeholder="Enter password" required>
 
-        <!-- Flash message block (appears above Submit button) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="flashes">
-              {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+  <form class="form-container" action="/user/signin" method="POST">
+    <h2>Sign in as User</h2>
 
-        <button type="submit">Submit</button>
-    </form>
-    <script>
-  // Automatically hide flash messages after 3 seconds
-  setTimeout(() => {
-    const flashMessages = document.querySelector('.flashes');
-    if (flashMessages) {
-      flashMessages.style.transition = "opacity 0.5s ease";
-      flashMessages.style.opacity = "0";
-      setTimeout(() => flashMessages.remove(), 500);
-    }
-  }, 1000); // 3 seconds
-</script>
+    <input type="email" name="email" placeholder="Enter email" required>
+    <input type="password" name="password" placeholder="Enter password" required>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <footer>© 2025 YouTube Uploader</footer>
+
+  <script>
+    // Automatically hide flash messages after 3 seconds
+    setTimeout(() => {
+      const flashMessages = document.querySelector('.flashes');
+      if (flashMessages) {
+        flashMessages.style.transition = "opacity 0.5s ease";
+        flashMessages.style.opacity = "0";
+        setTimeout(() => flashMessages.remove(), 500);
+      }
+    }, 3000);
+  </script>
+
 </body>
 </html>

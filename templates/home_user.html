@@ -1,229 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      min-height: 100vh;
+      color: #333;
+    }
 
-        .main-container {
-            background-color: white;
-            width: 900px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
+    .main-container {
+      background: #fff;
+      width: 95%;
+      max-width: 1000px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      padding: 30px 40px;
+      animation: fadeInUp 1s ease;
+      margin-bottom: 50px;
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      color: #5563DE;
+      margin-bottom: 30px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
 
-        .section {
-            border-top: 1px solid #ddd;
-            padding-top: 15px;
-        }
+    .section {
+      border-top: 1px solid #ddd;
+      padding-top: 25px;
+      margin-top: 20px;
+    }
 
-        .section h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
+    .section h3 {
+      font-size: 20px;
+      color: #444;
+      margin-bottom: 20px;
+    }
 
-        .video-list, .channel-list {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
+    .video-list, .channel-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
 
-        /* Channel items on one line */
-        .channel-item {
-            background-color: #f8f9fa;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .channel-item, .video-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-        .channel-info {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-            font-size: 15px;
-        }
+    .channel-item:hover, .video-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
 
-        .channel-info span strong {
-            color: #000;
-        }
+    .channel-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 15px;
+    }
 
-        .upload-form {
-            margin: 0;
-        }
+    .channel-info span strong {
+      color: #000;
+    }
 
-        .upload-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-            cursor: pointer;
-            font-size: 14px;
-        }
+    .upload-form {
+      margin: 0;
+    }
 
-        .upload-btn:hover {
-            background-color: #0056b3;
-        }
+    .upload-btn {
+      background-color: #5563DE;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
 
-        .video-item {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .upload-btn:hover {
+      background-color: #3f4acb;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+    }
 
-        .video-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px 20px;
-        }
+    .video-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 25px;
+      margin-top: 10px;
+    }
 
-        .video-details span {
-            font-size: 15px;
-            color: #333;
-        }
+    .video-details span {
+      font-size: 15px;
+      color: #333;
+    }
 
-        .video-details strong {
-            color: #000;
-        }
+    .video-details strong {
+      color: #000;
+    }
 
-        .thumbnail {
-            width: 120px;
-            height: 70px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
+    iframe {
+      border-radius: 8px;
+      margin-top: 8px;
+    }
 
-        a.video-link {
-            color: #007bff;
-            text-decoration: none;
-            word-break: break-all;
-        }
+    .thumbnail {
+      width: 140px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-top: 8px;
+    }
 
-        a.video-link:hover {
-            text-decoration: underline;
-        }
+    a.video-link {
+      color: #5563DE;
+      text-decoration: none;
+      word-break: break-all;
+    }
 
-    </style>
+    a.video-link:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div class="main-container">
-        <h2>Welcome to Your Dashboard</h2>
+  <div class="main-container">
+    <h2>Welcome to Your Dashboard</h2>
 
-        <!-- Your Channels Section -->
-        <div class="section">
-            <h3>Your Channels</h3>
-            <ul class="channel-list">
-                {% for entry in channels_info %}
-                <li>
-                    <div class="channel-item">
-                        <div class="channel-info">
-                            <span><strong>Channel Name:</strong> {{ entry['channel_name'] }}</span>
-                            <span><strong>Owner Email:</strong> {{ entry['owner_email'] }}</span>
-                        </div>
-
-                        <form class="upload-form" action="/upload-request" method="get">
-                            <input type="hidden" name="channel_name" value="{{ entry['channel_name'] }}">
-                            <input type="hidden" name="owner_email" value="{{ entry['owner_email'] }}">
-                            <button type="submit" class="upload-btn">Upload Video</button>
-                        </form>
-                    </div>
-                </li>
-                {% else %}
-                <li><p>No channels found.</p></li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Pending Approvals Section -->
-        <div class="section">
-            <h3>Pending Approvals</h3>
-            <ul class="video-list">
-                {% for video in pending_videos %}
-                {% set owner_info = pending_video_owner_info[loop.index0] %}
-                <li>
-                    <div class="video-item">
-                        <div class="video-details">
-                            <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
-                            <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
-                            <span><strong>Title:</strong> {{ video['title'] }}</span>
-                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
-                            <span><strong>Description:</strong> {{ video['description'] }}</span>
-                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
-                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-                            <span><strong>Video Preview:</strong> 
-                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
-                            </span>
-                            <span><strong>Thumbnail:</strong> 
-                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
-                            </span>
-                        </div>
-                    </div>
-                </li>
-                {% else %}
-                <li><p>No pending approvals.</p></li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Complete Approvals Section -->
-        <div class="section">
-            <h3>Complete Approvals</h3>
-            <ul class="video-list">
-                {% for video in approved_videos %}
-                {% set owner_info = approved_video_owner_info[loop.index0] %}
-                <li>
-                    <div class="video-item">
-                        <div class="video-details">
-                            <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
-                            <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
-                            <span><strong>Title:</strong> {{ video['title'] }}</span>
-                            <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
-                            <span><strong>Description:</strong> {{ video['description'] }}</span>
-                            <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
-                            <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-                            <span><strong>Video Preview:</strong> 
-                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
-                            </span>
-                            <span><strong>Thumbnail:</strong> 
-                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail" width="480" height="270">
-                            </span>
-                        </div>
-                    </div>
-                </li>
-                {% else %}
-                <li><p>No approved or disapproved videos yet.</p></li>
-                {% endfor %}
-            </ul>
-        </div>
+    <!-- Your Channels Section -->
+    <div class="section">
+      <h3>Your Channels</h3>
+      <ul class="channel-list">
+        {% for entry in channels_info %}
+        <li>
+          <div class="channel-item">
+            <div class="channel-info">
+              <span><strong>Channel Name:</strong> {{ entry['channel_name'] }}</span>
+              <span><strong>Owner Email:</strong> {{ entry['owner_email'] }}</span>
+              <form class="upload-form" action="/upload-request" method="get">
+                <input type="hidden" name="channel_name" value="{{ entry['channel_name'] }}">
+                <input type="hidden" name="owner_email" value="{{ entry['owner_email'] }}">
+                <button type="submit" class="upload-btn">Upload Video</button>
+              </form>
+            </div>
+          </div>
+        </li>
+        {% else %}
+        <li><p>No channels found.</p></li>
+        {% endfor %}
+      </ul>
     </div>
+
+    <!-- Pending Approvals Section -->
+    <div class="section">
+      <h3>Pending Approvals</h3>
+      <ul class="video-list">
+        {% for video in pending_videos %}
+        {% set owner_info = pending_video_owner_info[loop.index0] %}
+        <li>
+          <div class="video-item">
+            <div class="video-details">
+              <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
+              <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
+              <span><strong>Title:</strong> {{ video['title'] }}</span>
+              <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+              <span><strong>Description:</strong> {{ video['description'] }}</span>
+              <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+              <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+              <span><strong>Video Preview:</strong><br>
+                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
+              </span>
+              <span><strong>Thumbnail:</strong><br>
+                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail">
+              </span>
+            </div>
+          </div>
+        </li>
+        {% else %}
+        <li><p>No pending approvals.</p></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Complete Approvals Section -->
+    <div class="section">
+      <h3>Complete Approvals</h3>
+      <ul class="video-list">
+        {% for video in approved_videos %}
+        {% set owner_info = approved_video_owner_info[loop.index0] %}
+        <li>
+          <div class="video-item">
+            <div class="video-details">
+              <span><strong>Channel Name:</strong> {{ owner_info['channel_name'] }}</span>
+              <span><strong>Owner Email:</strong> {{ owner_info['owner_email'] }}</span>
+              <span><strong>Title:</strong> {{ video['title'] }}</span>
+              <span><strong>Category ID:</strong> {{ video['category_id'] }}</span>
+              <span><strong>Description:</strong> {{ video['description'] }}</span>
+              <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
+              <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
+              <span><strong>Video Preview:</strong><br>
+                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
+              </span>
+              <span><strong>Thumbnail:</strong><br>
+                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail">
+              </span>
+            </div>
+          </div>
+        </li>
+        {% else %}
+        <li><p>No approved or disapproved videos yet.</p></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <footer>© 2025 YouTube Uploader</footer>
 </body>
 </html>
