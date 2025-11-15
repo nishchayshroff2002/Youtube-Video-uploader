@@ -76,10 +76,6 @@
       font-size: 15px;
     }
 
-    .channel-info span strong {
-      color: #000;
-    }
-
     .upload-form {
       margin: 0;
     }
@@ -114,31 +110,17 @@
       color: #333;
     }
 
-    .video-details strong {
-      color: #000;
-    }
-
     iframe {
-      border-radius: 8px;
-      margin-top: 8px;
+      border-radius: 10px;
+      width: 420px;
+      height: 240px;
     }
 
     .thumbnail {
-      width: 140px;
-      height: 80px;
-      border-radius: 8px;
+      width: 420px;
+      height: 240px;
+      border-radius: 10px;
       object-fit: cover;
-      margin-top: 8px;
-    }
-
-    a.video-link {
-      color: #5563DE;
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    a.video-link:hover {
-      text-decoration: underline;
     }
 
     footer {
@@ -152,8 +134,28 @@
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* --- ADDED: side-by-side video + thumbnail --- */
+    .media-row {
+      grid-column: span 2;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 10px;
+    }
+
+    .media-item {
+      text-align: center;
+    }
+
+    .media-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
   </style>
 </head>
+
 <body>
   <div class="main-container">
     <h2>Welcome to Your Dashboard</h2>
@@ -198,12 +200,19 @@
               <span><strong>Description:</strong> {{ video['description'] }}</span>
               <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
               <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-              <span><strong>Video Preview:</strong><br>
-                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
-              </span>
-              <span><strong>Thumbnail:</strong><br>
-                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail">
-              </span>
+
+              <!-- UPDATED BLOCK -->
+              <div class="media-row">
+                <div class="media-item">
+                  <strong>Video Preview:</strong>
+                  <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" allowfullscreen></iframe>
+                </div>
+
+                <div class="media-item">
+                  <strong>Thumbnail:</strong>
+                  <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail">
+                </div>
+              </div>
             </div>
           </div>
         </li>
@@ -229,12 +238,19 @@
               <span><strong>Description:</strong> {{ video['description'] }}</span>
               <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
               <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
-              <span><strong>Video Preview:</strong><br>
-                <iframe src="{{ video['yt_video_url'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
-              </span>
-              <span><strong>Thumbnail:</strong><br>
-                <img src="{{ video['yt_thumb_url'] }}" class="thumbnail" alt="Thumbnail">
-              </span>
+
+              <!-- UPDATED BLOCK -->
+              <div class="media-row">
+                <div class="media-item">
+                  <strong>Video Preview:</strong>
+                  <iframe src="{{ video['yt_video_url'] }}" allowfullscreen></iframe>
+                </div>
+
+                <div class="media-item">
+                  <strong>Thumbnail:</strong>
+                  <img src="{{ video['yt_thumb_url'] }}" class="thumbnail" alt="Thumbnail">
+                </div>
+              </div>
             </div>
           </div>
         </li>
