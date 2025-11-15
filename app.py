@@ -302,7 +302,8 @@ def approve():
             status, response = vid_request.next_chunk()
             if status:
                 print(f"Uploading... {int(status.progress() * 100)}%")
-    
+    yt_video_id = response["id"]
+    print(f"yt video id:{yt_video_id}")
     thumb_file_name = f"{video_id}.{thumbnail_extension}"
     thumbnail_file = os.path.join(THUMBNAIL_FOLDER,thumb_file_name)
     if thumbnail_file and os.path.exists(thumbnail_file):
@@ -311,10 +312,17 @@ def approve():
             media_body=MediaFileUpload(thumbnail_file)
         ).execute()
         print("✅ Thumbnail uploaded successfully!")
-    communication.send_approved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension)
-    db.approve_video(video_id)
+    
+    yt_embed_video_link = f"https://www.youtube.com/embed/{yt_video_id}"
+    yt_watch_video_link = f"https://www.youtube.com/watch?v={yt_video_id}"
+    yt_thumb_url = f"https://i.ytimg.com/vi/{yt_video_id}/mqdefault.jpg"
+
+
+    communication.send_approved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension,yt_watch_video_link,yt_thumb_url)
+    db.approve_video(video_id,yt_embed_video_link,yt_thumb_url)
     params={"owner_email": owner_email, "channel_name":channel_name}
-    flash("Video disapproved successfully")
+
+    flash("Video approved successfully")
     return redirect(f"/owner/home?{urlencode(params)}")
 
 if __name__ == "__main__":

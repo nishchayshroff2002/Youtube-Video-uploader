@@ -127,7 +127,7 @@ def send_disapproved_message(receiver_email,channel_name,owner_email,title,descr
     except Exception as e:
         print("Error:", e)
 
-def send_approved_message(receiver_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension):
+def send_approved_message(receiver_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension,yt_video_url,yt_thumb_url):
 
     # Create a fresh message object each time
     msg = MIMEMultipart("alternative")
@@ -175,12 +175,26 @@ def send_approved_message(receiver_email,channel_name,owner_email,title,descript
         <td><b>Thumbnail File</b></td>
         <td>{thumbnail_file_name}.{thumbnail_extension}</td>
       </tr>
+
+      <!-- New Row: Video Link -->
+      <tr>
+        <td><b>Video Link</b></td>
+        <td><a href="{yt_video_url}" target="_blank" style="color: #1a73e8;">{yt_video_url}</a></td>
+      </tr>
+
+      <!-- New Row: Thumbnail Link -->
+      <tr>
+        <td><b>Thumbnail Link</b></td>
+        <td><a href="{yt_thumb_url}" target="_blank" style="color: #1a73e8;">{yt_thumb_url}</a></td>
+      </tr>
+
     </table>
 
     <p style="margin-top: 20px;">Please check in the approved section of the home page to view the details.</p>
   </body>
 </html>
 """
+
     msg.attach(MIMEText(body, "html"))
 
     try:

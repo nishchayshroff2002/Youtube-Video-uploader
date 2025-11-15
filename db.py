@@ -99,7 +99,9 @@ def insert_video(title,description,tags,category_id,privacy_status,video_file_na
         "thumbnail_extension": thumbnail_extension,
         "user_id":user_id,
         "owner_id":owner_id,
-        "is_approved":False
+        "is_approved":False,
+        "yt_video_url":"",
+        "yt_thumb_url":""
     }
     result = video_info.insert_one(entry)
     print("Inserted video id ", result.inserted_id)
@@ -154,9 +156,9 @@ def get_approved_video_info_owner(owner_id):
         return result
     return []
 
-def approve_video(video_id):
+def approve_video(video_id,yt_video_url,yt_thumb_url):
     query={"_id":ObjectId(video_id)}
-    update_params={"$set":{"is_approved":True}}
+    update_params={"$set":{"is_approved":True,"yt_video_url":yt_video_url,"yt_thumb_url":yt_thumb_url}}
     result = video_info.update_one(query,update_params)
     print("video approved in db")
 

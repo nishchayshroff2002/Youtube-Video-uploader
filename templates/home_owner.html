@@ -240,11 +240,11 @@
                             <span><strong>Privacy:</strong> {{ video['privacy_status'] }}</span>
                             <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
                             <span><strong>Video Preview:</strong> 
-                                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" 
+                                <iframe src="{{ video['yt_video_url'] }}" 
                                         width="480" height="270" frameborder="0" allowfullscreen></iframe>
                             </span>
                             <span><strong>Thumbnail:</strong> 
-                                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" 
+                                <img src="{{ video['yt_thumb_url'] }}" 
                                      class="thumbnail" alt="Thumbnail" width="480" height="270">
                             </span>
                         </div>

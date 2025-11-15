@@ -230,10 +230,10 @@
               <span><strong>Privacy Status:</strong> {{ video['privacy_status'] }}</span>
               <span><strong>Tags:</strong> {{ video['tags'] | join(', ') }}</span>
               <span><strong>Video Preview:</strong><br>
-                <iframe src="/videos/{{ video['_id'] }}.{{ video['video_extension'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
+                <iframe src="{{ video['yt_video_url'] }}" width="480" height="270" frameborder="0" allowfullscreen></iframe>
               </span>
               <span><strong>Thumbnail:</strong><br>
-                <img src="/thumbnails/{{ video['_id'] }}.{{ video['thumbnail_extension'] }}" class="thumbnail" alt="Thumbnail">
+                <img src="{{ video['yt_thumb_url'] }}" class="thumbnail" alt="Thumbnail">
               </span>
             </div>
           </div>
