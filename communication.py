@@ -73,7 +73,7 @@ def send_disapproved_message(receiver_email,channel_name,owner_email,title,descr
     body = f"""
 <html>
   <body style="font-family: Arial, sans-serif; color: #333;">
-    <h2>Hi owner,</h2>
+    <h2>Hi user,</h2>
     <p>Owner <b>{owner_email}</b> has <b>disapproved</b> the upload of your video to the channel <b>{channel_name}</b>.</p>
 
     <p>The details of the video are as follows:</p>
@@ -137,7 +137,7 @@ def send_approved_message(receiver_email,channel_name,owner_email,title,descript
     body = f"""
 <html>
   <body style="font-family: Arial, sans-serif; color: #333;">
-    <h2>Hi owner,</h2>
+    <h2>Hi user,</h2>
     <p>Owner <b>{owner_email}</b> has <b>approved</b> the upload of your video to the channel <b>{channel_name}</b>.</p>
 
     <p>The details of the video are as follows:</p>

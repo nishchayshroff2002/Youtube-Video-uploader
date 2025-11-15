@@ -249,6 +249,8 @@ def disapprove():
         tags = [t.strip() for t in tags.split(",")]
     communication.send_disapproved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension)
     db.delete_pending_video(video_id)
+    os.remove(os.path.join(VIDEO_FOLDER, video_id+"."+video_extension))
+    os.remove(os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension))
     params={"owner_email": owner_email, "channel_name":channel_name}
     flash("Video disapproved successfully")
     return redirect(f"/owner/home?{urlencode(params)}")
@@ -320,6 +322,8 @@ def approve():
 
     communication.send_approved_message(user_email,channel_name,owner_email,title,description,tags,category_id,privacy_status,video_file_name,video_extension,thumbnail_file_name,thumbnail_extension,yt_watch_video_link,yt_thumb_url)
     db.approve_video(video_id,yt_embed_video_link,yt_thumb_url)
+    os.remove(os.path.join(VIDEO_FOLDER, video_id+"."+video_extension))
+    os.remove(os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension))
     params={"owner_email": owner_email, "channel_name":channel_name}
 
     flash("Video approved successfully")
