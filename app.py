@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = "super_secret_key"
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:5000/oauth"
+REDIRECT_URI = os.getenv("REDIRECT_URL")
 
 BASE_UPLOAD_PATH = "data/uploads"
 VIDEO_FOLDER = os.path.join(BASE_UPLOAD_PATH, "videos")
@@ -330,5 +330,5 @@ def approve():
     return redirect(f"/owner/home?{urlencode(params)}")
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
     # 
