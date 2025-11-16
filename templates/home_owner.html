@@ -149,6 +149,22 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+      .flashes {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    .flashes li {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      animation: fadeInDown 0.5s ease;
+    }
     </style>
 </head>
 <body>
@@ -218,6 +234,15 @@
                                 <button type="submit" class="disapprove-btn">Disapprove</button>
                             </form>
                         </div>
+                    {% with messages = get_flashed_messages(category_filter=["disapproved","approved"]) %}
+                    {% if messages %}
+                        <ul class="flashes">
+                        {% for  message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% endwith %}
                     </div>
                 </li>
                 {% else %}
@@ -256,5 +281,16 @@
             </ul>
         </div>
     </div>
+    <script>
+    // Automatically hide flash messages after 3 seconds
+    setTimeout(() => {
+      const flashMessages = document.querySelector('.flashes');
+      if (flashMessages) {
+        flashMessages.style.transition = "opacity 0.5s ease";
+        flashMessages.style.opacity = "0";
+        setTimeout(() => flashMessages.remove(), 500);
+      }
+    }, 6000);
+  </script>
 </body>
 </html>

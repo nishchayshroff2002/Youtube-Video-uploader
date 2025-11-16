@@ -120,11 +120,11 @@
     <input type="email" name="email" placeholder="Enter email" required>
     <input type="password" name="password" placeholder="Enter password" required>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(category_filter=["password_incorrect"]) %}
       {% if messages %}
         <ul class="flashes">
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
+          {% for message in messages %}
+            <li>{{ message }}</li>
           {% endfor %}
         </ul>
       {% endif %}

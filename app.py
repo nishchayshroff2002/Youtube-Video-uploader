@@ -154,7 +154,7 @@ def user_signin():
     elif password_from_db == session["password"]:
         return redirect("/user/home")
     else:
-        flash("incorrect password")
+        flash("incorrect password","password_incorrect")
         return render_template("signin_user.html")
 
 
@@ -169,7 +169,7 @@ def verify_otp():
         db.insert_user(session["email"],session["password"])
         return redirect("/user/home")
     else :
-        flash("incorrect otp")
+        flash("incorrect otp","otp_incorrect")
 
 @app.route("/user/home", methods =['GET'])
 def home_user():
@@ -219,7 +219,7 @@ def upload_video():
         thumb_path = os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension)
         thumb_file.save(thumb_path)
     communication.send_approval_message(owner_email,channel_name,session["email"])
-    flash(f"upload request sent successfully!", "success")
+    flash(f"upload request sent successfully!", "approval_request_sent")
     return redirect("/user/home")
 
 @app.route("/pending-approvals",methods=['GET'])
@@ -252,7 +252,7 @@ def disapprove():
     os.remove(os.path.join(VIDEO_FOLDER, video_id+"."+video_extension))
     os.remove(os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension))
     params={"owner_email": owner_email, "channel_name":channel_name}
-    flash("Video disapproved successfully")
+    flash("Video disapproved successfully","disapproved")
     return redirect(f"/owner/home?{urlencode(params)}")
 
 @app.route("/approve",methods=['POST'])
@@ -326,7 +326,7 @@ def approve():
     os.remove(os.path.join(THUMBNAIL_FOLDER, video_id+"."+thumbnail_extension))
     params={"owner_email": owner_email, "channel_name":channel_name}
 
-    flash("Video approved successfully")
+    flash("Video approved successfully","approved")
     return redirect(f"/owner/home?{urlencode(params)}")
 
 if __name__ == "__main__":

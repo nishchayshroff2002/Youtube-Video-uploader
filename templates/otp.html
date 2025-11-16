@@ -106,6 +106,21 @@
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .flashes {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    .flashes li {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      animation: fadeInDown 0.5s ease;
+    }
   </style>
 </head>
 <body>
@@ -116,9 +131,29 @@
     <input type="text" name="otp" maxlength="8" placeholder="Enter OTP" required>
     <button type="submit">Verify OTP</button>
     <!-- <a href="/user/resend_otp" class="resend">Resend OTP</a> -->
+      {% with messages = get_flashed_messages(category_filter=["otp_incorrect"]) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for  message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
   </form>
-
+  
   <footer>© 2025 YouTube Uploader</footer>
-
+   <script>
+    // Automatically hide flash messages after 3 seconds
+    setTimeout(() => {
+      const flashMessages = document.querySelector('.flashes');
+      if (flashMessages) {
+        flashMessages.style.transition = "opacity 0.5s ease";
+        flashMessages.style.opacity = "0";
+        setTimeout(() => flashMessages.remove(), 500);
+      }
+    }, 3000);
+  </script>
 </body>
 </html>

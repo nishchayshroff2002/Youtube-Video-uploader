@@ -7,7 +7,7 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      background: #eef2f7;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -153,6 +153,21 @@
       display: block;
       margin-bottom: 6px;
     }
+    .flashes {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    .flashes li {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      animation: fadeInDown 0.5s ease;
+    }
   </style>
 </head>
 
@@ -174,6 +189,15 @@
                 <input type="hidden" name="channel_name" value="{{ entry['channel_name'] }}">
                 <input type="hidden" name="owner_email" value="{{ entry['owner_email'] }}">
                 <button type="submit" class="upload-btn">Upload Video</button>
+                {% with messages = get_flashed_messages(category_filter=["approval_request_sent"]) %}
+                {% if messages %}
+                  <ul class="flashes">
+                    {% for  message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endwith %}
               </form>
             </div>
           </div>
@@ -261,6 +285,16 @@
     </div>
   </div>
 
-  <footer>© 2025 YouTube Uploader</footer>
+  <script>
+    // Automatically hide flash messages after 3 seconds
+    setTimeout(() => {
+      const flashMessages = document.querySelector('.flashes');
+      if (flashMessages) {
+        flashMessages.style.transition = "opacity 0.5s ease";
+        flashMessages.style.opacity = "0";
+        setTimeout(() => flashMessages.remove(), 500);
+      }
+    }, 3000);
+  </script>
 </body>
 </html>
