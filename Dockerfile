@@ -13,11 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy entire project
 COPY . .
 
-# Expose the port Cloud Run / Deployra will use
+# Informational port (not required by platform)
 EXPOSE 8080
 
-# Set environment variable for Flask inside the container
+# Default fallback port (overridden by platform)
 ENV PORT=8080
 
-# Command to run the app
+# Start the app
 CMD ["python", "app.py"]
